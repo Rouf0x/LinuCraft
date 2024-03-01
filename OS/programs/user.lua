@@ -25,5 +25,5 @@ elseif action == "clear" then
     file:write("root")
     file:close()
 else
-    print("Usages: \n label set \n label clear")
+    print("Usages: \n user set \n user clear")
 end
