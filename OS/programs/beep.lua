@@ -5,6 +5,7 @@ local sound = args[1]
 if peripheral.find("speaker") then
     if sound then
         if sound == "stop" then
+            peripheral.find("speaker").playSound(sound)
             print("Stopped.")
         else
             peripheral.find("speaker").playSound(sound)
