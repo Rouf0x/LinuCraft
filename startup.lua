@@ -54,10 +54,10 @@ while true do
 
     term.setTextColor(colors.green)
 
-    if label ~= nil then
+    if label ~= nil and username ~= nil then
         term.write(username.. "@" .. label) 
     else
-        kernelPanic("001 | NO USERNAME", "term.write(username.. \"@\" .. label)")
+        kernelPanic("001 | NO LABEL/USERNAME", "term.write(username.. \"@\" .. label)")
     end
 
     term.setTextColor(colors.white)
