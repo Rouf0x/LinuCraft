@@ -13,6 +13,7 @@ local help = {
     "MOVE // Moves one or more files from one directory ",
     "to another directory.",
     "",
+    "PAINT // Basic graphic editor to make images.",
     "IMAGEVIEWER // View images on computer.",
     "REBOOT // Shuts down and turns on the computer.",
     "SET // Changes default system settings.",
