@@ -11,7 +11,7 @@ I included some programs that I coded with it
 
 ### Prerequisite : Minecraft | Forge/Fabric | CC Tweaked (Or an edited version of ComputerCraft, as the "pastebin" command is broken in the new version.).
 
-###You need to setup an *Advanced Computer* for it to work.
+### You need to setup an *Advanced Computer* for it to work.
 
 In the command line of the computer. Type out:
 
