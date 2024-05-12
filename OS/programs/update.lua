@@ -1,5 +1,4 @@
 term.clear()
-term.setCursorPos(0,0)
 print("Updating LinuCraft...")
 
 local function getFileContents(url)
@@ -14,6 +13,10 @@ local function getFileContents(url)
 end
 
 local function updateFile(filePath, fileUrl)
+    if filePath == "user.txt" then
+        return
+    end
+
     local currentContents = ""
     if fs.exists(filePath) then
         local file = fs.open(filePath, "r")
