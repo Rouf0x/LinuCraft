@@ -13,7 +13,7 @@ local function getFileContents(url)
 end
 
 local function updateFile(filePath, fileUrl)
-    if filePath == "user.txt" then
+    if filePath == "OS/user.txt" then
         return
     end
 
