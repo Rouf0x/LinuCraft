@@ -1,76 +1,100 @@
-local settingsFile = "OS/settings.txt"
+os.pullEvent = os.pullEventRaw
 
-local settings = {
-    { name = "Update on startup", key = "update_startup", checked = false },
-    { name = "Dummy setting 2", key = "dummy_setting_2", checked = false }
-}
-
-local selectedSetting = 1
-
-local function loadSettings()
-    if fs.exists(settingsFile) then
-        local file = fs.open(settingsFile, "r")
-        local data = textutils.unserialize(file.readAll())
+function kernelPanic(reason, log)
+    if fs.exists("CrashLOG.txt") then
+        local file = io.open("CrashLOG.txt", "r")
+        print("The system has encountered another kernelPanic.")
+        print("kernelPanic loop detected, booting into craftOS...")
+        print("\nIf the problem persists, you may have to reinstall LinuCraft")
+        sleep(5)
+        shell.run("rm CrashLOG.txt")
+        shell.run("shell")
+    else
+        --local file = io.open("CrashLOG.txt", "r")
+        local file = fs.open("CrashLOG.txt", "w")
+        file.write("CRASH_DETECTED")
         file.close()
-
-        for _, setting in ipairs(settings) do
-            if data[setting.key] ~= nil then
-                setting.checked = data[setting.key]
-            end
-        end
-    end
-end
-
-local function saveSettings()
-    local data = {}
-
-    for _, setting in ipairs(settings) do
-        data[setting.key] = setting.checked
     end
 
-    local file = fs.open(settingsFile, "w")
-    file.write(textutils.serialize(data))
-    file.close()
-end
-
-local function drawMenu()
     term.clear()
-    term.setCursorPos(1, 1)
-    print(" - Settings - \n")
-    print("Press up/down to navigate, space to toggle, enter to confirm.\n")
-    print("Select a setting to toggle:")
-    
-    for i, setting in ipairs(settings) do
-        local checkbox = setting.checked and "[X]" or "[ ]"
-        if i == selectedSetting then
-            term.setTextColor(colors.yellow)
-            print(checkbox .. " // " .. setting.name)
-            term.setTextColor(colors.white)
-        else
-            print(checkbox .. " // " .. setting.name)
-        end
-    end
+    term.setCursorPos(1,1)
+    term.setBackgroundColour(colors.black)
+    term.setTextColor(colors.white)
+    print("A fatal error made LinuCraft crash!")
+    term.setTextColor(colors.red)
+    print(log, "<--")
+    term.setTextColor(colors.white)
+    print("Kernel panic - " .. reason)
+    print("\nPlease reboot LinuCraft or press any key to continue.")
+    os.pullEvent("key")
+    print("\nShutting down...")
+    sleep(3)
+    os.shutdown()
 end
 
-local function toggleSetting()
-    settings[selectedSetting].checked = not settings[selectedSetting].checked
+shell.setPath(shell.path() .. ":/OS/programs")
+local label = os.getComputerLabel()
+
+local userPath = "OS/user.txt"
+local file = io.open(userPath, "r")
+
+if file then
+    username = file.read(file)
+    file.close(file)
+else
+    print("Error: Unable to retrieve Username")
 end
 
--- Load settings on startup
-loadSettings()
+-- Load settings from the file
+local settingsFile = "OS/settings.txt"
+local settings = {}
+
+if fs.exists(settingsFile) then
+    local file = fs.open(settingsFile, "r")
+    settings = textutils.unserialize(file.readAll())
+    file.close()
+else
+    print("Settings file not found. Creating default settings.")
+end
+
+-- Function to get a setting value by its key
+local function getSettingValue(settingKey)
+    return settings[settingKey]
+end
+
+term.clear()
+term.setCursorPos(1,1)
+print("LinuCraft 0.2")
+
+-- Check if "Dummy setting 2" is true and print "hi"
+if getSettingValue("dummy_setting_2") then
+    print("hi")
+end
 
 while true do
-    drawMenu()
-    local event, key = os.pullEvent("key")
-    
-    if key == keys.up then
-        selectedSetting = selectedSetting > 1 and selectedSetting - 1 or #settings
-    elseif key == keys.down then
-        selectedSetting = selectedSetting < #settings and selectedSetting + 1 or 1
-    elseif key == keys.space then
-        toggleSetting()
-    elseif key == keys.enter then
-        saveSettings()
-        break
+    term.setTextColor(colors.green)
+
+    if label ~= nil and username ~= nil then
+        term.write(username.. "@" .. label) 
+    else
+        kernelPanic("001 | NO LABEL/USERNAME", "term.write(username.. \"@\" .. label)")
+    end
+
+    term.setTextColor(colors.white)
+    term.write(":")
+    term.setTextColor(colors.blue)
+
+    local pathSeparator = (shell.dir() == "") and "" or "/"
+    term.write("~" .. pathSeparator..shell.dir() .. " " .. "$ ")
+
+    term.setTextColor(colors.white)
+    local input = read()
+
+    if input == "help" then
+        shell.run("OS/programs/help")
+    elseif input == "about" then
+        shell.run("OS/programs/about")
+    else
+        shell.run(input)
     end
 end
