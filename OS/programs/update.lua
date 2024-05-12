@@ -71,4 +71,4 @@ end
 
 print("")
 print("Update completed!")
-os.reboot()
+print("Please manually reboot for it to take effect.")
