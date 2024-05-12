@@ -62,14 +62,15 @@ local function getSettingValue(settingKey)
     return settings[settingKey]
 end
 
-term.clear()
-term.setCursorPos(1,1)
-print("LinuCraft 0.2")
-
--- Check if "Dummy setting 2" is true and print "hi"
 if getSettingValue("update_startup") then
     shell.run("OS/programs/update.lua")
 end
+
+term.setTextColor(colors.white)
+
+term.clear()
+term.setCursorPos(1,1)
+print("LinuCraft 0.2")
 
 while true do
     term.setTextColor(colors.green)
