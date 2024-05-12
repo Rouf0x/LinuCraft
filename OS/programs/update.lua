@@ -30,12 +30,12 @@ local function updateFile(filePath, fileUrl)
             local file = fs.open(filePath, "w")
             file.write(newContents)
             file.close()
-            print("[Updated]", filePath)
+            print("[OK]", filePath)
             if peripheral.find("speaker") then
                 peripheral.find("speaker").playSound("entity.arrow.hit_player") 
             end
         else
-            print("[Unchanged]", filePath)
+            print("[OK]", filePath)
         end
     else
         print("Failed to download file: " .. fileUrl)
