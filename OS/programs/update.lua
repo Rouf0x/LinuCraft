@@ -71,3 +71,4 @@ end
 
 print("")
 print("Update completed!")
+os.reboot()
