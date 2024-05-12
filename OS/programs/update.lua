@@ -20,6 +20,10 @@ local function getFileContents(url)
 end
 
 local function updateFile(filePath, fileUrl)
+    if filePath == "user.txt" then
+        return
+    end
+    
     local currentContents = ""
     if fs.exists(filePath) then
         local file = fs.open(filePath, "r")
@@ -44,6 +48,7 @@ local function updateFile(filePath, fileUrl)
         print("Failed to download file: " .. fileUrl)
     end
 end
+
 
 print("")
 term.setTextColor(colors.green)
