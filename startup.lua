@@ -1,80 +1,76 @@
-os.pullEvent = os.pullEventRaw
+local settingsFile = "OS/settings.txt"
 
-function kernelPanic(reason, log)
+local settings = {
+    { name = "Update on startup", key = "update_startup", checked = false },
+    { name = "Dummy setting 2", key = "dummy_setting_2", checked = false }
+}
 
-    if fs.exists("CrashLOG.txt") then
-        local file = io.open("CrashLOG.txt", "r")
-        print("The system has encountered another kernelPanic.")
-        print("kernelPanic loop detected, booting into craftOS...")
-        print("\nIf the problem persist you may have to reinstall LinuCraft")
-        sleep(5)
-        shell.run("rm CrashLOG.txt")
-        shell.run("shell")
-    else
-        --local file = io.open("CrashLOG.txt", "r")
-        local file = fs.open("CrashLOG.txt", "w")
-        file.write("CRASH_DETECTED")
+local selectedSetting = 1
+
+local function loadSettings()
+    if fs.exists(settingsFile) then
+        local file = fs.open(settingsFile, "r")
+        local data = textutils.unserialize(file.readAll())
         file.close()
+
+        for _, setting in ipairs(settings) do
+            if data[setting.key] ~= nil then
+                setting.checked = data[setting.key]
+            end
+        end
+    end
+end
+
+local function saveSettings()
+    local data = {}
+
+    for _, setting in ipairs(settings) do
+        data[setting.key] = setting.checked
     end
 
+    local file = fs.open(settingsFile, "w")
+    file.write(textutils.serialize(data))
+    file.close()
+end
+
+local function drawMenu()
     term.clear()
-    term.setCursorPos(1,1)
-    term.setBackgroundColour(colors.black)
-    term.setTextColor(colors.white)
-    print("A fatal error made LinuCraft crash!")
-    term.setTextColor(colors.red)
-    print(log, "<--")
-    term.setTextColor(colors.white)
-    print("Kernel panic - " .. reason)
-    print("\nPlease reboot LinuCraft or press any key to continue.")
-    os.pullEvent("key")
-    print("\nShutting down...")
-    sleep(3)
-    os.shutdown()
+    term.setCursorPos(1, 1)
+    print(" - Settings - \n")
+    print("Press up/down to navigate, space to toggle, enter to confirm.\n")
+    print("Select a setting to toggle:")
+    
+    for i, setting in ipairs(settings) do
+        local checkbox = setting.checked and "[X]" or "[ ]"
+        if i == selectedSetting then
+            term.setTextColor(colors.yellow)
+            print(checkbox .. " // " .. setting.name)
+            term.setTextColor(colors.white)
+        else
+            print(checkbox .. " // " .. setting.name)
+        end
+    end
 end
 
-shell.setPath(shell.path() .. ":/OS/programs")
-local label = os.getComputerLabel()
-
-local userPath = "OS/user.txt"
-local file = io.open(userPath, "r")
-
-if file then
-    username = file.read(file)
-    file.close(file)
-else
-    print("Error: Unable to retrieve Username")
+local function toggleSetting()
+    settings[selectedSetting].checked = not settings[selectedSetting].checked
 end
 
-term.clear()
-term.setCursorPos(1,1)
-print("LinuCraft 0.2")
+-- Load settings on startup
+loadSettings()
 
 while true do
-
-    term.setTextColor(colors.green)
-
-    if label ~= nil and username ~= nil then
-        term.write(username.. "@" .. label) 
-    else
-        kernelPanic("001 | NO LABEL/USERNAME", "term.write(username.. \"@\" .. label)")
-    end
-
-    term.setTextColor(colors.white)
-    term.write(":")
-    term.setTextColor(colors.blue)
-
-    local pathSeparator = (shell.dir() == "") and "" or "/"
-    term.write("~" .. pathSeparator..shell.dir() .. " " .. "$ ")
-
-    term.setTextColor(colors.white)
-    local input = read()
-
-    if input == "help" then
-        shell.run("OS/programs/help")
-    elseif input == "about" then
-        shell.run("OS/programs/about")
-    else
-        shell.run(input)
+    drawMenu()
+    local event, key = os.pullEvent("key")
+    
+    if key == keys.up then
+        selectedSetting = selectedSetting > 1 and selectedSetting - 1 or #settings
+    elseif key == keys.down then
+        selectedSetting = selectedSetting < #settings and selectedSetting + 1 or 1
+    elseif key == keys.space then
+        toggleSetting()
+    elseif key == keys.enter then
+        saveSettings()
+        break
     end
 end
