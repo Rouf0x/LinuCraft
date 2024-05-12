@@ -67,8 +67,8 @@ term.setCursorPos(1,1)
 print("LinuCraft 0.2")
 
 -- Check if "Dummy setting 2" is true and print "hi"
-if getSettingValue("dummy_setting_2") then
-    print("hi")
+if getSettingValue("update_startup") then
+    shell.run("OS/programs/update.lua")
 end
 
 while true do
